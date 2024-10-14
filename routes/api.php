@@ -10,7 +10,6 @@ use App\Http\Controllers\Role\CreateRoleController;
 use App\Http\Controllers\Role\DeleteRoleController;
 use App\Http\Controllers\Role\UpdateRoleController;
 use App\Http\Controllers\Role\ListRoleController;
-use App\Http\Controllers\Role\RemoveProtocolFromRoleController;
 use App\Http\Controllers\Role\ShowRoleController;
 use App\Http\Controllers\User\AssignRoleToUserController;
 use App\Http\Controllers\User\CreateUserController;
@@ -18,6 +17,7 @@ use App\Http\Controllers\User\DeleteUserController;
 use App\Http\Controllers\User\ListUserController;
 use App\Http\Controllers\User\ShowUserController;
 use App\Http\Controllers\User\UpdateUserController;
+use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth', AuthController::class);
@@ -25,7 +25,7 @@ Route::post('/auth', AuthController::class);
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/user')->group(function () {
         Route::get('/', ShowUserController::class);
-        Route::middleware(['role:Manager'])->group(function () {
+        Route::middleware([CheckRole::class . ':Manager'])->group(function () {
             Route::get('/list', ListUserController::class);
             Route::put('/{id_user}', UpdateUserController::class);
             Route::post('/', CreateUserController::class);
@@ -33,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{user_id}/role/{role_id}', AssignRoleToUserController::class);
         });
     });
-    Route::middleware(['role:Manager'])->group(function () {
+    Route::middleware([CheckRole::class . ':Manager'])->group(function () {
         Route::prefix('/role')->group(function () { // só o manager deve ter acesso
             Route::get('/', ListRoleController::class); //Lista todas as roles e seus papeis, só o manager deve ter acesso
             Route::post('/', CreateRoleController::class);
