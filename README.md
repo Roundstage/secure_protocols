@@ -21,17 +21,17 @@ para o Vue.
 - Docker
 
 ### Configuração do Projeto
-
-1. **Execute o Sail**
-   ```sail up -d```
-
-2. **Execute o vite**
+1. Execute as configurações básicas, podem ser alteradas depois.
+```
+[ ! -f .env ] && cp .env.example .env; docker run --rm -u "$(id -u):$(id -g)" -v $(pwd):/var/www/html -w /var/www/html laravelsail/php82-composer:latest composer install && sail up -d && sail artisan key:generate && sail npm install && sail artisan migrate --seed
+```
+2. **Execute o Sail**
+   ```
+   sail up -d
+   ```
+3. **Execute o vite**
    ```
    npm run dev
-   ```
-4. **Execute as Migrações**
-   ```sh
-    sail artisan migrate --seed
    ```
 
 Com esse passo a passo acima, você deve conseguir entrar e executar o projeto. Basta entrar na URL definida no Env,
@@ -42,3 +42,5 @@ email: test@example.com
 password: password
 ```
 Nisso você tem acesso pra criar e editar, usuários, papeis, protocolos e alterar os papeis das roles.
+
+Qualquer dúvida pode me chamar!
