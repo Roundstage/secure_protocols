@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/list', ListUserController::class);
         Route::put('/{id_user}', UpdateUserController::class);
         Route::post('/', CreateUserController::class);
+        //Route::delete('/', DeleteUserController::class);
         Route::put('/{user_id}/role/{role_id}', AssignRoleToUserController::class);
     });
     Route::prefix('/role')->group(function () { // só o manager deve ter acesso

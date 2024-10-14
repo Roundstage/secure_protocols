@@ -8,9 +8,13 @@ import {Link} from '@inertiajs/vue3';
 import ProtocolEdit from "@/Pages/Protocols/Components/ProtocolEdit.vue";
 import ProtocolCreate from "@/Pages/Protocols/Components/ProtocolCreate.vue";
 import {useToast} from 'primevue/usetoast';
-
+import ProtocolService from "@/Pages/Services/ProtocolService.ts";
 import {ref, onBeforeMount} from 'vue';
+import UserService from "@/Pages/Services/UserService.ts";
 
+UserService.fetchUser();
+
+const toast = useToast();
 
 const Protocols = ref({
     data: [
@@ -23,27 +27,18 @@ const Protocols = ref({
     ]
 });
 
-onBeforeMount(async () =>
-    fetch('/api/protocol', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-    }).then(response => {
-        if (!response.ok) {
-            $inertia.visit('/login');
-            return;
-        }
-        return response.json();
-    }).then(data => {
-        Protocols.value = data;
-    })
-);
+const fetchProtocols = async () => {
+    try {
+        const data = await ProtocolService.fetchProtocols();
+        Protocols.value.data = data.data;
+    } catch (error) {
+        console.error('Error fetching protocols:', error);
+        $inertia.visit('/login');
+    }
+};
 
+onBeforeMount(fetchProtocols);
 
-
-const toast = useToast();
 const receiveDataFromChild = (data) => {
     const index = Protocols.value.data.findIndex(protocol => protocol.id === data.id);
     if (index !== -1) {
@@ -56,22 +51,21 @@ const receiveDataFromChild = (data) => {
 const confirmDelete = async (id) => {
     if (confirm('Are you sure you want to delete this Protocol?')) {
         try {
-            const response = await fetch(`/api/protocol/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                },
-            });
+            const response = await ProtocolService.deleteProtocol(id);
 
-            if (response.ok) {
-                Protocols.value.data = Protocols.value.data.filter(data => data.id !== id);
-                toast.add({severity: 'success', summary: 'Success', detail: 'Role deleted successfully', life: 3000});
+            if (response.status === 200) {
+                Protocols.value.data = Protocols.value.data.filter(protocol => protocol.id !== id);
+                toast.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Protocol deleted successfully',
+                    life: 3000
+                });
             } else {
-                toast.add({severity: 'error', summary: 'Error', detail: 'Failed to delete role', life: 3000});
+                toast.add({severity: 'error', summary: 'Error', detail: 'Failed to delete protocol', life: 3000});
             }
         } catch (error) {
-            toast.add({severity: 'error', summary: 'Error', detail: 'Failed to delete role', life: 3000});
+            toast.add({severity: 'error', summary: 'Error', detail: 'Failed to delete protocol', life: 3000});
         }
     }
 };

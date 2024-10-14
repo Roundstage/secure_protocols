@@ -4,43 +4,29 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Toolbar from "primevue/toolbar";
 import Button from "primevue/button";
-import {Link} from '@inertiajs/vue3';
 import UserEdit from "@/Pages/User/Components/UserEdit.vue";
 import UserCreate from "@/Pages/User/Components/UserCreate.vue";
 import {useToast} from 'primevue/usetoast';
-
+import UserService from "@/Pages/Services/UserService.ts";
 import {ref, onBeforeMount} from 'vue';
 
-const Users = ref({
-    data: [
-        {
-            id: 1,
-            name: 'John Doe',
-            email: 'john@example.com',
-            role: 'Admin'
-        },
-    ]
-});
 
-onBeforeMount(async () =>
-    fetch('/api/user/list', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-    }).then(response => {
-        if (!response.ok) {
-            $inertia.visit('/login');
-            return;
-        }
-        return response.json();
-    }).then(data => {
-        Users.value = data;
-    })
-);
-
+UserService.fetchUser();
+const Users = ref([]);
 const toast = useToast();
+
+const fetchUsers = async () => {
+    try {
+        const data = await UserService.fetchUserList();
+        Users.value = data;
+    } catch (error) {
+        console.error('Error fetching user list:', error);
+        $inertia.visit('/login');
+    }
+};
+
+onBeforeMount(fetchUsers);
+
 const receiveDataFromChild = (data) => {
     const index = Users.value.data.findIndex(user => user.id === data.id);
     if (index !== -1) {
@@ -53,22 +39,16 @@ const receiveDataFromChild = (data) => {
 const confirmDelete = async (id) => {
     if (confirm('Are you sure you want to delete this User?')) {
         try {
-            const response = await fetch(`/api/user/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                },
-            });
+            const response = await UserService.deleteUser(id);
 
             if (response.ok) {
                 Users.value.data = Users.value.data.filter(data => data.id !== id);
-                toast.add({severity: 'success', summary: 'Success', detail: 'User deleted successfully', life: 3000});
+                toast.add({ severity: 'success', summary: 'Success', detail: 'User deleted successfully', life: 3000 });
             } else {
-                toast.add({severity: 'error', summary: 'Error', detail: 'Failed to delete user', life: 3000});
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete user', life: 3000 });
             }
         } catch (error) {
-            toast.add({severity: 'error', summary: 'Error', detail: 'Failed to delete user', life: 3000});
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete user', life: 3000 });
         }
     }
 };

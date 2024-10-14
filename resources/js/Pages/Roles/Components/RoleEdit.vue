@@ -4,74 +4,48 @@ import Textarea from "primevue/textarea";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import MultiSelect from "primevue/multiselect";
+import {useToast} from 'primevue/usetoast';
+import ProtocolService from "@/Pages/Services/ProtocolService.ts";
+import RoleService from "@/Pages/Services/RoleService.ts";
 
-const handleSubmit = () => {
-    fetch('/api/role/'+form.value.id, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(form.value)
-    }).then(response => {
-        return response.json();
-    }).then(data => {
-        emit('update', data.data);
-    })
-    fetch('/api/role/'+form.value.id+'/protocols', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({'protocols':form.value.protocols.map(p => p.id)})
-    }).then(response => {
-        return response.json();
-    })
-}
+const toast = useToast();
 
 const form = ref({
-    id:'',
+    id: '',
     level: '',
     name: '',
     description: '',
-    protocols: [{
-        id: 1,
-        name: 'Viribus Protocol',
-        description: 'You should train to gain strength',
-        priority: 10
-    }]
-})
-const props = defineProps({role: {id: String, level: String, name: String, description: String}});
+    protocols: []
+});
+
+const props = defineProps({ role: { id: String, level: String, name: String, description: String } });
 const emit = defineEmits(['update']);
 const visible = ref(false);
 
-const Protocols = ref([
-    {
-        id: 1,
-        name: 'Viribus Protocol',
-        description: 'You should train to gain strength',
-        priority: 10
-    }
-]);
+const Protocols = ref([]);
 
-onBeforeMount(async () =>
-    fetch('/api/protocol', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-    }).then(response => {
-        if (!response.ok) {
-            $inertia.visit('/login');
-            return;
-        }
-        return response.json();
-    }).then(data => {
+const fetchProtocols = async () => {
+    try {
+        const data = await ProtocolService.fetchProtocols();
         Protocols.value = data.data;
-    })
-);
+    } catch (error) {
+        console.error('Error fetching protocols:', error);
+        $inertia.visit('/login');
+    }
+};
+
+const handleSubmit = async () => {
+    try {
+        const roleData = await RoleService.updateRole(form.value.id, form.value);
+        await RoleService.updateRoleProtocols(form.value.id, form.value.protocols.map(p => p.id));
+        emit('update', roleData.data);
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Role and protocols updated successfully', life: 3000 });
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update role or protocols', life: 3000 });
+    }
+};
+
+onBeforeMount(fetchProtocols);
 
 onUpdated(() => {
     form.value.id = props.role.id;
@@ -82,8 +56,7 @@ onUpdated(() => {
         const matchedProtocol = Protocols.value.find(p => p.id === protocol.id);
         return matchedProtocol ? matchedProtocol : protocol;
     }) : form.value.protocols;
-
-})
+});
 </script>
 
 <template>

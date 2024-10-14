@@ -3,36 +3,29 @@ import {ref, onMounted, watch, onUpdated} from 'vue';
 import Textarea from "primevue/textarea";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
+import Toast from 'primevue/toast';
+import {useToast} from 'primevue/usetoast';
+import UserService from "@/Pages/Services/UserService.ts";
 
-const handleSubmit = () => {
-    Promise.all([
-        fetch(`/api/user/${form.value.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                'Cache-Control': 'no-cache'
-            },
-            body: JSON.stringify(form.value)
-        }),
-        fetch(`/api/user/${form.value.id}/role/${form.value.role.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                'Cache-Control': 'no-cache'
-            }
-        })
-    ]).then(async ([userResponse, roleResponse]) => {
-        const userData = await userResponse.json();
-        const roleData = await roleResponse.json();
-        console.log(roleData);
+const toast = useToast();
+
+const handleSubmit = async () => {
+    try {
+        const [userData, roleData] = await Promise.all([
+            UserService.updateUser(form.value.id, form.value),
+            UserService.updateUserRole(form.value.id, form.value.role.id)
+        ]);
+
         const updatedUser = {
             ...userData.data,
             role: roleData.data.role
         };
         emit('update', updatedUser);
-    });
+        toast.add({ severity: 'success', summary: 'Success', detail: 'User updated successfully.', life: 3000 });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update user.', life: 3000 });
+    }
 }
 
 const Roles = ref([]);
@@ -42,34 +35,25 @@ const form = ref({
     email: '',
     role: ''
 });
-const props = defineProps({user: {id: String, name: String, email: String, role: Object}});
+const props = defineProps({ user: { id: String, name: String, email: String, role: Object } });
 const emit = defineEmits(['update']);
 const visible = ref(false);
 
-onUpdated(() => {
+onUpdated(async () => {
     Object.assign(form.value, props.user);
 
-    fetch('/api/role', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-            'Cache-Control': 'no-cache'
-        }
-    }).then(response => {
-        if (!response.ok) {
-            $inertia.visit('/login');
-            return;
-        }
-        return response.json();
-    }).then(data => {
+    try {
+        const data = await UserService.fetchRoles();
         Roles.value = data.data;
-    });
+    } catch (error) {
+        console.error('Error fetching roles:', error);
+        $inertia.visit('/login');
+    }
 });
 </script>
 
 <template>
-    <Button @click="visible = true" outlined rounded icon="pi pi-pencil"></Button>
+    <Button @click="visible = true" outlined rounded icon="pi pi-pencil" severity="success" ></Button>
     <Dialog v-model:visible="visible" modal header="Edit User" :style="{ width: '25rem' }">
         <form @submit.prevent="handleSubmit" class="p-fluid mx-auto" style="max-width: 400px; margin-top: 50px;">
             <div class="form-group">
@@ -89,6 +73,7 @@ onUpdated(() => {
             <button type="submit" class="btn btn-primary">Update User</button>
         </form>
     </Dialog>
+    <Toast/>
 </template>
 
 <style scoped>

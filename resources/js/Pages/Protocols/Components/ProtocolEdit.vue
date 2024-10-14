@@ -3,38 +3,45 @@ import {ref, onMounted, watch, onUpdated} from 'vue';
 import Textarea from "primevue/textarea";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
-
-const handleSubmit = () => {
-    fetch('/api/protocol/' + form.value.id, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(form.value)
-    }).then(response => {
-        return response.json();
-    }).then(data => {
-        emit('update', data.data);
-    })
-}
+import {useToast} from 'primevue/usetoast';
+import ProtocolService from "@/Pages/Services/ProtocolService.ts";
+const toast = useToast();
 
 const form = ref({
     id: '',
     priority: 0,
     name: '',
     description: ''
-})
-const props = defineProps({protocol: {id: String,name: String,description: String,  priority: Number}});
+});
+
+const props = defineProps({
+    protocol: {
+        id: String,
+        name: String,
+        description: String,
+        priority: Number
+    }
+});
+
 const emit = defineEmits(['update']);
 const visible = ref(false);
+
+const handleSubmit = async () => {
+    try {
+        const data = await ProtocolService.updateProtocol(form.value.id, form.value);
+        emit('update', data.data);
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Protocol updated successfully', life: 3000 });
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update protocol', life: 3000 });
+    }
+};
 
 onUpdated(() => {
     form.value.id = props.protocol.id;
     form.value.priority = props.protocol.priority;
     form.value.name = props.protocol.name;
     form.value.description = props.protocol.description;
-})
+});
 </script>
 
 <template>

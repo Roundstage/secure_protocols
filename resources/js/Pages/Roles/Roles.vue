@@ -8,53 +8,32 @@ import RoleCreate from "@/Pages/Roles/Components/RoleCreate.vue";
 import {useToast} from 'primevue/usetoast';
 import RoleEdit from "@/Pages/Roles/Components/RoleEdit.vue";
 import {ref, onBeforeMount} from 'vue';
+import RoleService from "@/Pages/Services/RoleService";
+import UserService from "@/Pages/Services/UserService.ts";
 
-const Roles = ref({
-    data: [
-        {
-            id: 1,
-            name: 'Admin',
-            description: 'Full access to all features',
-            level: 10
-        },
-        {
-            id: 2,
-            name: 'Editor',
-            description: 'Can edit content',
-            level: 7
-        },
-        {
-            id: 3,
-            name: 'Viewer',
-            description: 'Can view content only',
-            level: 1
-        }
-    ]
-});
+UserService.fetchUser();
 
-onBeforeMount(async () =>
-    fetch('/api/role', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-    }).then(response => {
-        if(!response.ok){
-            $inertia.visit('/login');
-            return;
-        }
-        return response.json();
-    }).then(data => {
-        Roles.value.data = data.data;
-    })
-);
+const Roles = ref({ data: [] });
+
 const toast = useToast();
+
+const fetchRoles = async () => {
+    try {
+        const data = await RoleService.getRoles();
+        Roles.value.data = data.data;
+    } catch (error) {
+        console.error('Error fetching roles:', error);
+        $inertia.visit('/login');
+    }
+};
+
+onBeforeMount(fetchRoles);
+
 const receiveDataFromChild = (data) => {
     const index = Roles.value.data.findIndex(role => role.id === data.id);
     if (index !== -1) {
         Roles.value.data[index] = data;
-        return
+        return;
     }
     Roles.value.data.push(data);
 };
@@ -62,15 +41,8 @@ const receiveDataFromChild = (data) => {
 const confirmDelete = async (id) => {
     if (confirm('Are you sure you want to delete this role?')) {
         try {
-            const response = await fetch(`/api/role/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                },
-            });
-
-            if (response.ok) {
+            const response = await RoleService.deleteRole(id);
+            if (response.status === 200) {
                 Roles.value.data = Roles.value.data.filter(role => role.id !== id);
                 toast.add({severity: 'success', summary: 'Success', detail: 'Role deleted successfully', life: 3000});
             } else {

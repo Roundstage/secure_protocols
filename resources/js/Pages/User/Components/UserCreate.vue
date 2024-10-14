@@ -2,27 +2,30 @@
 import {ref} from 'vue'
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
+import Toast from 'primevue/toast';
+import {useToast} from 'primevue/usetoast';
+import UserService from "@/Pages/Services/UserService.ts";
 
 const form = ref({
     name: '',
     email: '',
     password: ''
-})
-const handleSubmit = () => {
-    fetch('/api/user', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(form.value)
-    }).then(response => {
-        return response.json();
-    }).then(data => {
+});
+
+const toast = useToast();
+
+const handleSubmit = async () => {
+    try {
+        const data = await UserService.createUser(form.value);
         emit('update', data.data);
-    })
+        toast.add({ severity: 'success', summary: 'Success', detail: 'User created successfully!', life: 3000 });
+    } catch (error) {
+        console.error('Error creating user:', error);
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create user.', life: 3000 });
+    }
 }
-const emit = defineEmits(['update'], 1);
+
+const emit = defineEmits(['update']);
 const visible = ref(false);
 </script>
 
@@ -45,6 +48,7 @@ const visible = ref(false);
             <button type="submit" class="btn btn-primary">Create User</button>
         </form>
     </Dialog>
+    <Toast/>
 </template>
 
 <style scoped>

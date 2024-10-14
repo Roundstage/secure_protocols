@@ -16,7 +16,7 @@ class DeleteRoleController extends Controller
         try {
             $role = Role::findOrFail($id);
             $role->delete();
-            return response()->json(['success' => 'Role deleted successfully.'], 201);
+            return response()->json(['success' => 'Role deleted successfully.'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error deleting role: ' . $e->getMessage()], 500);
         }

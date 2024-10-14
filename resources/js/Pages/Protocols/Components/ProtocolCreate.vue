@@ -2,28 +2,28 @@
 import {ref} from 'vue'
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
-
+import Toast from "primevue/toast";
+import {useToast} from 'primevue/usetoast';
+import ProtocolService from "@/Pages/Services/ProtocolService.ts";
 const form = ref({
     priority: 0,
     name: '',
     description: ''
-})
-const handleSubmit = () => {
-    fetch('/api/protocol', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(form.value)
-    }).then(response => {
-        return response.json();
-    }).then(data => {
-        emit('update', data.data);
-    })
-}
-const emit = defineEmits(['update'], 1);
+});
+
+const toast = useToast();
+const emit = defineEmits(['update']);
 const visible = ref(false);
+
+const handleSubmit = async () => {
+    try {
+        const data = await ProtocolService.createProtocol(form.value);
+        emit('update', data.data);
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Protocol created successfully!', life: 3000 });
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create protocol', life: 3000 });
+    }
+};
 </script>
 
 <template>
@@ -45,6 +45,7 @@ const visible = ref(false);
             <button type="submit" class="btn btn-primary">Create Protocol</button>
         </form>
     </Dialog>
+    <Toast></Toast>
 </template>
 
 <style scoped>

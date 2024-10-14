@@ -2,27 +2,10 @@
 import Navbar from "./Components/Navbar.vue"
 import Accordion from "@/Pages/Components/Accordion.vue";
 import {onBeforeMount} from "vue";
-const User = JSON.parse(localStorage.getItem('user')) || null;
-function fetchUser() {
-    fetch('/api/user', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-    }).then(response => {
-        if (!response.ok) {
-            $inertia.visit('/login');
-            return;
-        }
-        return response.json();
-    }).then(data => {
-        localStorage.setItem('user', JSON.stringify(data.data));
-        User.value = data.data;
-    })
-}
+import UserService from "@/Pages/Services/UserService.ts";
 
-fetchUser()
+UserService.fetchUser();
+const User = JSON.parse(localStorage.getItem('user')) || null;
 
 </script>
 
