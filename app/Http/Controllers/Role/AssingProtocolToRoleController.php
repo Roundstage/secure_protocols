@@ -6,9 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AssingProtocolRequest;
 use App\Models\Protocol;
 use App\Models\Role;
+use App\Services\RoleService;
 
 class AssingProtocolToRoleController extends Controller
 {
+    protected RoleService $roleService;
+
+    public function __construct(RoleService $roleService)
+    {
+        $this->roleService = $roleService;
+    }
+
     /**
      * Handle the incoming request.
      */
@@ -16,20 +24,13 @@ class AssingProtocolToRoleController extends Controller
     {
         try {
             $validatedRequest = $request->validated();
-            $role = Role::findOrFail($role_id);
-            foreach ($validatedRequest['protocols'] as $protocol){
-                $protocol = Protocol::findOrFail($protocol);
-                $role->protocols()->sync($validatedRequest['protocols']);
-            }
-            $role->save();
-
+            $role = $this->roleService->assignProtocolsToRole($role_id, $validatedRequest['protocols']);
             return response()->json([
                 'success' => 'Protocol added to role successfully.',
-                'data' => $role->fresh(), // Using fresh() to get the latest state of the user
+                'data' => $role, // Using fresh() to get the latest state of the user
             ]);
         } catch (\Exception $exception) {
-            return response()->json(['error'=>$exception->getMessage(), 'data'=>null]);
+            return response()->json(['error' => $exception->getMessage(), 'data' => null]);
         }
-
     }
 }

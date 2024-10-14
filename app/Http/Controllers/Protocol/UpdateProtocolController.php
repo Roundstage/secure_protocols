@@ -6,9 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateProtocolRequest;
 use App\Models\Protocol;
 use Illuminate\Http\Request;
+use App\Services\ProtocolService;
 
 class UpdateProtocolController extends Controller
 {
+    protected ProtocolService $protocolService;
+
+    public function __construct(ProtocolService $protocolService)
+    {
+        $this->protocolService = $protocolService;
+    }
+
     /**
      * Handle the incoming request.
      */
@@ -16,10 +24,8 @@ class UpdateProtocolController extends Controller
     {
         try {
             $id_protocol = (int)$id_protocol;
-            $protocol = Protocol::findOrFail($id_protocol);
             $validatedData = $request->validated();
-
-            $protocol->update($validatedData);
+            $protocol = $this->protocolService->update($id_protocol, $validatedData);
             return response()->json(['success' => 'Protocol updated successfully', 'data' => $protocol], 200);
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], 500);

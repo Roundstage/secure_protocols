@@ -40,8 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}', ShowRoleController::class); //Lista uma role específica
             Route::put('/{id}', UpdateRoleController::class);
             Route::delete('/{id}', DeleteRoleController::class);
-            Route::put('/{id}/protocols', AssingProtocolToRoleController::class); // Adiciona protocolos a essa role
-            Route::delete('/{id}/protocols', RemoveProtocolFromRoleController::class); // Retira um ou mais protocolos
+            Route::put('/{id}/protocols', AssingProtocolToRoleController::class); // Sincroniza protocolos a essa role
         });
         Route::prefix('/protocol')->group(function () { // Apenas o manager deve ter acesso
             Route::get('/', ListProtocolController::class); //Lista todos os protocolos

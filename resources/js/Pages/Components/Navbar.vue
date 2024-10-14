@@ -1,8 +1,10 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
-import {onBeforeMount} from "vue";
-
+import { Link, router } from '@inertiajs/vue3'
 const User = JSON.parse(localStorage.getItem('user'));
+const logout = () => {
+    localStorage.clear();
+    router.visit('/login')
+};
 </script>
 
 <template>
@@ -15,18 +17,30 @@ const User = JSON.parse(localStorage.getItem('user'));
             <div class="collapsed navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <Link class="nav-link active" aria-current="page" method="get" as="button" type="button" href="/">Home</Link>
+                        <Link class="nav-link active" aria-current="page" method="get" as="button" type="button"
+                              href="/">Home
+                        </Link>
                     </li>
-                    <li class="nav-item" v-if="User.role.level === 'Manager'">
-                        <Link class="nav-link active" aria-current="page" method="get" as="button" type="button" href="/user">Users</Link>
+                    <li class="nav-item" v-if="User && User.role.level === 'Manager'">
+                        <Link class="nav-link active" aria-current="page" method="get" as="button" type="button"
+                              href="/user">Users
+                        </Link>
                     </li>
-                    <li class="nav-item" v-if="User.role.level === 'Manager'">
-                        <Link class="nav-link active" aria-current="page" method="get" as="button" type="button" href="/roles">Roles</Link>
+                    <li class="nav-item" v-if="User && User.role.level === 'Manager'">
+                        <Link class="nav-link active" aria-current="page" method="get" as="button" type="button"
+                              href="/roles">Roles
+                        </Link>
                     </li>
-                    <li class="nav-item" v-if="User.role.level === 'Manager'">
-                        <Link class="nav-link active" aria-current="page" method="get" as="button" type="button" href="/protocol">Protocols</Link>
+                    <li class="nav-item" v-if="User && User.role.level === 'Manager'">
+                        <Link class="nav-link active" aria-current="page" method="get" as="button" type="button"
+                              href="/protocol">Protocols
+                        </Link>
                     </li>
+                    <li v-if="!User && $nextTick(() => $inertia.visit('/'))"></li>
                 </ul>
+                <div class="nav-item ms-auto">
+                    <button class="nav-link active" @click="logout">Logout</button>
+                </div>
             </div>
         </div>
     </nav>

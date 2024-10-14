@@ -4,17 +4,22 @@ namespace App\Http\Controllers\Role;
 
 use App\Http\Controllers\Controller;
 use App\Models\Role;
+use App\Services\RoleService;
 use Illuminate\Http\Request;
 
 class ShowRoleController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
+    protected RoleService $roleService;
+
+    public function __construct(RoleService $roleService)
+    {
+        $this->roleService = $roleService;
+    }
+
     public function __invoke(int $id_role, Request $request)
     {
         try {
-            $role = Role::findOrFail($id_role);
+            $role = $this->roleService->find($id_role);
             $role->load('protocols');
             return response()->json(['success' => 'Role fetched successfully', 'data' => $role]);
         } catch (\Exception $exception) {

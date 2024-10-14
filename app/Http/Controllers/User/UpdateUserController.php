@@ -3,20 +3,25 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\EditRoleRequest;
 use App\Http\Requests\EditUserRequest;
-use App\Models\User;
+use App\Services\UserService;
 
 class UpdateUserController extends Controller
 {
+    protected UserService $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     /**
      * Handle the incoming request.
      */
     public function __invoke(int $id_user, EditUserRequest $request)
     {
         try {
-            $user = User::findOrFail($id_user);
-            $user->update($request->validated());
+            $user = $this->userService->update($id_user, $request->validated());
 
             return response()->json([
                 'message' => 'User updated successfully',

@@ -4,11 +4,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\AuthService;
+
 
 class AuthController extends Controller
 {
+    protected AuthService $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     /**
      * Handle the incoming request.
      */
@@ -19,23 +26,12 @@ class AuthController extends Controller
             $email = $validated['email'];
             $password = $validated['password'];
 
-            if (Auth::attempt(['email' => $email, 'password' => $password])) {
-                $user = Auth::user();
-                $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json($this->authService->authenticate($email, $password));
 
-                return response()->json([
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                ]);
-            } else {
-                return response()->json([
-                    'error' => 'Unauthorized'
-                ], 401);
-            }
         } catch (\Exception $exception) {
             return response()->json([
                 'error' => $exception->getMessage(),
-            ], 500);
+            ], 400);
         }
     }
 }

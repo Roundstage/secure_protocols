@@ -22,17 +22,9 @@ Route::get('/protocol', function () {
     return Inertia::render('Protocols/Protocols');
 });
 
-Route::prefix('/roles')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Roles/Roles');
-    });
-    Route::get('/create', function () {
-        return Inertia::render('Roles/RoleCreate');
-    });
-    Route::get('/edit/{id}', function () {
-        return Inertia::render('Roles/RoleEdit');
-    });
-
+Route::get('/roles', function () {
+    return Inertia::render('Roles/Roles');
 });
+
 
 

@@ -3,6 +3,7 @@ import Navbar from "./Components/Navbar.vue"
 import Accordion from "@/Pages/Components/Accordion.vue";
 import {ref, onBeforeMount} from 'vue';
 import UserService from "@/Pages/Services/UserService.ts";
+UserService.fetchUser();
 
 const User = ref({
     id: 1,
@@ -29,7 +30,7 @@ onBeforeMount(fetchUser);
 </script>
 
 <template>
-    <Navbar></Navbar>
+    <Navbar :user="User"></Navbar>
     <div class="container py-4">
         <div class="row align-items-md-stretch">
             <div class="col-md-6">
