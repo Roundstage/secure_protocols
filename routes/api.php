@@ -13,7 +13,10 @@ use App\Http\Controllers\Role\ListRoleController;
 use App\Http\Controllers\Role\RemoveProtocolFromRoleController;
 use App\Http\Controllers\Role\ShowRoleController;
 use App\Http\Controllers\User\AssignRoleToUserController;
+use App\Http\Controllers\User\CreateUserController;
+use App\Http\Controllers\User\ListUserController;
 use App\Http\Controllers\User\ShowUserController;
+use App\Http\Controllers\User\UpdateUserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth', AuthController::class);
@@ -21,6 +24,9 @@ Route::post('/auth', AuthController::class);
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/user')->group(function () {
         Route::get('/', ShowUserController::class);
+        Route::get('/list', ListUserController::class);
+        Route::put('/{id_user}', UpdateUserController::class);
+        Route::post('/', CreateUserController::class);
         Route::put('/{user_id}/role/{role_id}', AssignRoleToUserController::class);
     });
     Route::prefix('/role')->group(function () { // só o manager deve ter acesso

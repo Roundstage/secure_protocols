@@ -20,10 +20,12 @@ class AssignRoleToUserController extends Controller
             $role = Role::findOrFail($role_id);
             $user->role()->associate($role);
             $user->save();
+            $user->fresh();
+            $user->load('role');
 
             return response()->json([
                 'success' => 'Role added successfully.',
-                'data' => $user->fresh(), // Using fresh() to get the latest state of the user
+                'data' => $user, // Using fresh() to get the latest state of the user
             ]);
         } catch (\Exception $exception){
             return response()->json(['error' => $exception->getMessage()], 403);

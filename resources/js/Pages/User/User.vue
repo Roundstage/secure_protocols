@@ -23,7 +23,7 @@ const Users = ref({
 });
 
 onBeforeMount(async () =>
-    fetch('/api/user', {
+    fetch('/api/user/list', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ const confirmDelete = async (id) => {
                            tableStyle="min-width: 50rem" v-slot="slotProps">
                     <Column field="name" header="Name"></Column>
                     <Column field="email" header="Email" style="max-width: 30%"></Column>
-                    <Column field="role" header="Role"></Column>
+                    <Column field="role.name" header="Role"></Column>
                     <Column :exportable="true" style="min-width:8rem">
                         <template #body="slotProps">
                             <UserEdit :user="slotProps.data" @update="receiveDataFromChild"/>

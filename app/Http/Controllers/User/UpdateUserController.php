@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EditRoleRequest;
+use App\Http\Requests\EditUserRequest;
 use App\Models\User;
 
 class UpdateUserController extends Controller
@@ -11,10 +12,10 @@ class UpdateUserController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(EditUserRequest $request)
+    public function __invoke(int $id_user, EditUserRequest $request)
     {
         try {
-            $user = User::findOrFail($request->id);
+            $user = User::findOrFail($id_user);
             $user->update($request->validated());
 
             return response()->json([

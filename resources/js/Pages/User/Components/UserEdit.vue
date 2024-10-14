@@ -5,36 +5,67 @@ import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 
 const handleSubmit = () => {
-    fetch('/api/users/' + form.value.id, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(form.value)
-    }).then(response => {
-        return response.json();
-    }).then(data => {
-        emit('update', data.data);
-    })
+    Promise.all([
+        fetch(`/api/user/${form.value.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                'Cache-Control': 'no-cache'
+            },
+            body: JSON.stringify(form.value)
+        }),
+        fetch(`/api/user/${form.value.id}/role/${form.value.role.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                'Cache-Control': 'no-cache'
+            }
+        })
+    ]).then(async ([userResponse, roleResponse]) => {
+        const userData = await userResponse.json();
+        const roleData = await roleResponse.json();
+        console.log(roleData);
+        const updatedUser = {
+            ...userData.data,
+            role: roleData.data.role
+        };
+        emit('update', updatedUser);
+    });
 }
 
+const Roles = ref([]);
 const form = ref({
     id: '',
     name: '',
     email: '',
     role: ''
-})
-const props = defineProps({user: {id: String, name: String, email: String, role: String}});
+});
+const props = defineProps({user: {id: String, name: String, email: String, role: Object}});
 const emit = defineEmits(['update']);
 const visible = ref(false);
 
 onUpdated(() => {
-    form.value.id = props.user.id;
-    form.value.name = props.user.name;
-    form.value.email = props.user.email;
-    form.value.role = props.user.role;
-})
+    Object.assign(form.value, props.user);
+
+    fetch('/api/role', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Cache-Control': 'no-cache'
+        }
+    }).then(response => {
+        if (!response.ok) {
+            $inertia.visit('/login');
+            return;
+        }
+        return response.json();
+    }).then(data => {
+        Roles.value = data.data;
+    });
+});
 </script>
 
 <template>
@@ -51,7 +82,9 @@ onUpdated(() => {
             </div>
             <div class="form-group">
                 <label for="role">Role</label>
-                <input type="text" id="role" class="form-control" v-model="form.role"/>
+                <select id="role" class="form-control" v-model="form.role">
+                    <option v-for="role in Roles" :key="role.id" :value="role">{{ role.name }}</option>
+                </select>
             </div>
             <button type="submit" class="btn btn-primary">Update User</button>
         </form>

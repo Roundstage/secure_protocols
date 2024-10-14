@@ -4,12 +4,12 @@ import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 
 const form = ref({
-    username: '',
+    name: '',
     email: '',
     password: ''
 })
 const handleSubmit = () => {
-    fetch('/api/users', {
+    fetch('/api/user', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ const visible = ref(false);
         <form @submit.prevent="handleSubmit" class="p-fluid mx-auto" style="max-width: 400px; margin-top: 50px;">
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" class="form-control" v-model="form.username"/>
+                <input type="text" id="username" class="form-control" v-model="form.name"/>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>

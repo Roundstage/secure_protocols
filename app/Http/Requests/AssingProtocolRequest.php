@@ -24,7 +24,7 @@ class AssingProtocolRequest extends FormRequest
     {
         return [
             'protocols' => ['required', 'array'],
-            'protocols.*' => ['exists:protocols,id'],
+            'protocols.*' => ['integer', 'exists:protocols,id'],
         ];
     }
 }

@@ -19,7 +19,7 @@ class AssingProtocolToRoleController extends Controller
             $role = Role::findOrFail($role_id);
             foreach ($validatedRequest['protocols'] as $protocol){
                 $protocol = Protocol::findOrFail($protocol);
-                $role->protocols()->attach($protocol);
+                $role->protocols()->sync($validatedRequest['protocols']);
             }
             $role->save();
 

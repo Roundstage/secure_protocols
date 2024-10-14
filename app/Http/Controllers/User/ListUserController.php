@@ -16,6 +16,7 @@ class ListUserController extends Controller
     {
         try {
             $users = User::all();
+            $users->load('role');
             return response()->json(['message' => 'Protocol added to user successfully.', 'data' => $users]);
         } catch (\Exception $exception) {
             return response()->json(['message' => $exception->getMessage(), 'users' => null], 500);
