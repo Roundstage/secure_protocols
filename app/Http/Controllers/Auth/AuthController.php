@@ -14,22 +14,28 @@ class AuthController extends Controller
      */
     public function __invoke(AuthRequest $request)
     {
-        $validated = $request->validated();
-        $email = $validated['email'];
-        $password = $validated['password'];
+        try {
+            $validated = $request->validated();
+            $email = $validated['email'];
+            $password = $validated['password'];
 
-        if (Auth::attempt(['email' => $email, 'password' => $password])) {
-            $user = Auth::user();
-            $token = $user->createToken('auth_token')->plainTextToken;
+            if (Auth::attempt(['email' => $email, 'password' => $password])) {
+                $user = Auth::user();
+                $token = $user->createToken('auth_token')->plainTextToken;
 
+                return response()->json([
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                ]);
+            } else {
+                return response()->json([
+                    'error' => 'Unauthorized'
+                ], 401);
+            }
+        } catch (\Exception $exception) {
             return response()->json([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Unauthorized'
-            ], 401);
+                'error' => $exception->getMessage(),
+            ], 500);
         }
     }
 }

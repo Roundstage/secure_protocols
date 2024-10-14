@@ -17,7 +17,7 @@ class CreateProtocolController extends Controller
         try {
             $protocol = new Protocol($request->validated());
             $protocol->save();
-            return response()->json(['success' => 'Protocol created successfully.', 'protocol'=>$protocol->fresh()], 201);
+            return response()->json(['success' => 'Protocol created successfully.', 'data'=>$protocol->fresh()], 201);
         }catch (\Exception $exception){
             return response()->json(['error' => $exception->getMessage()], 500);
         }

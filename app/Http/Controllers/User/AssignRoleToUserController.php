@@ -14,7 +14,7 @@ class AssignRoleToUserController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke($user_id, $role_id, AssingRoleRequest $request){
+    public function __invoke(int $user_id, int $role_id, AssingRoleRequest $request){
         try {
             $user = User::findOrFail($user_id);
             $role = Role::findOrFail($role_id);
@@ -23,7 +23,7 @@ class AssignRoleToUserController extends Controller
 
             return response()->json([
                 'success' => 'Role added successfully.',
-                'user' => $user->fresh(), // Using fresh() to get the latest state of the user
+                'data' => $user->fresh(), // Using fresh() to get the latest state of the user
             ]);
         } catch (\Exception $exception){
             return response()->json(['error' => $exception->getMessage()], 403);

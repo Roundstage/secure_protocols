@@ -12,7 +12,8 @@ class ProtocolFactory extends Factory
     public function definition(): array
     {
         return [
-            'description' => fake()->word() . ' protocol',
+            'name' => fake()->word() . ' protocol',
+            'description' => fake()->paragraph(),
             'priority' => fake()->randomNumber(2),
         ];
     }

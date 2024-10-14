@@ -11,6 +11,7 @@ class Protocol extends Model
     use HasFactory;
 
     protected $fillable = [
+        'name',
         'description',
         'priority',
     ];

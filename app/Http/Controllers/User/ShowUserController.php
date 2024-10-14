@@ -18,7 +18,8 @@ class ShowUserController extends Controller
             $user->role->load('protocols');
 
             return response()->json([
-                'user' => $user,
+                'success' => 'User successfully retrieved',
+                'data' => $user,
             ]);
         } catch (\Exception $e) {
             return response()->json([

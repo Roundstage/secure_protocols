@@ -12,7 +12,7 @@ class AssingProtocolToRoleController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke($role_id, AssingProtocolRequest $request)
+    public function __invoke(int $role_id, AssingProtocolRequest $request)
     {
         try {
             $validatedRequest = $request->validated();
@@ -24,11 +24,11 @@ class AssingProtocolToRoleController extends Controller
             $role->save();
 
             return response()->json([
-                'message' => 'Protocol added to role successfully.',
-                'role' => $role->fresh(), // Using fresh() to get the latest state of the user
+                'success' => 'Protocol added to role successfully.',
+                'data' => $role->fresh(), // Using fresh() to get the latest state of the user
             ]);
         } catch (\Exception $exception) {
-            return response()->json(['message'=>$exception->getMessage(), 'role'=>null]);
+            return response()->json(['error'=>$exception->getMessage(), 'data'=>null]);
         }
 
     }

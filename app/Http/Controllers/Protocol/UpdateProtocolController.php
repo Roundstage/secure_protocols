@@ -20,7 +20,7 @@ class UpdateProtocolController extends Controller
             $validatedData = $request->validated();
 
             $protocol->update($validatedData);
-            return response()->json(['success' => 'Protocol updated successfully', 'protocol' => $protocol], 200);
+            return response()->json(['success' => 'Protocol updated successfully', 'data' => $protocol], 200);
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], 500);
         }

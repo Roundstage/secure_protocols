@@ -13,7 +13,7 @@ class RemoveProtocolFromRoleController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke($role_id, AssingProtocolRequest $request)
+    public function __invoke(int $role_id, AssingProtocolRequest $request)
     {
         try {
             $validatedRequest = $request->validated();
@@ -23,7 +23,7 @@ class RemoveProtocolFromRoleController extends Controller
                 $role->protocols()->detach($protocol);
             }
             $role->save();
-            return response()->json(null, 204);
+            return response()->json(['success' => 'Protocols removed successfully'], 204);
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], 400);
         }

@@ -15,7 +15,7 @@ class ListRoleController extends Controller
     {
         try {
             $roles = Role::all();
-            return response()->json(['message' => 'Protocol added to role successfully.', 'roles'=>$roles]);
+            return response()->json(['message' => 'Protocol added to role successfully.', 'data'=>$roles]);
         } catch (\Exception $exception){
             return response()->json(['message' => $exception->getMessage(), 'roles'=>null], 500);
         }

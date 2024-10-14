@@ -6,6 +6,9 @@ use App\Http\Controllers\Protocol\DeleteProtocolController;
 use App\Http\Controllers\Protocol\ListProtocolController;
 use App\Http\Controllers\Protocol\UpdateProtocolController;
 use App\Http\Controllers\Role\AssingProtocolToRoleController;
+use App\Http\Controllers\Role\CreateRoleController;
+use App\Http\Controllers\Role\DeleteRoleController;
+use App\Http\Controllers\Role\UpdateRoleController;
 use App\Http\Controllers\Role\ListRoleController;
 use App\Http\Controllers\Role\RemoveProtocolFromRoleController;
 use App\Http\Controllers\Role\ShowRoleController;
@@ -22,7 +25,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::prefix('/role')->group(function () { // só o manager deve ter acesso
         Route::get('/', ListRoleController::class); //Lista todas as roles e seus papeis, só o manager deve ter acesso
+        Route::post('/', CreateRoleController::class);
         Route::get('/{id}', ShowRoleController::class); //Lista uma role específica
+        Route::put('/{id}', UpdateRoleController::class);
+        Route::delete('/{id}', DeleteRoleController::class);
         Route::put('/{id}/protocols', AssingProtocolToRoleController::class); // Adiciona protocolos a essa role
         Route::delete('/{id}/protocols', RemoveProtocolFromRoleController::class); // Retira um ou mais protocolos
     });

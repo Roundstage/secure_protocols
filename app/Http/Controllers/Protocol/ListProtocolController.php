@@ -15,7 +15,7 @@ class ListProtocolController extends Controller
     {
         try {
             $protocols = Protocol::all();
-            return response()->json($protocols);
+            return response()->json(['success' => 'Protocols successfully fetched', 'data' => $protocols]);
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], 500);
         }

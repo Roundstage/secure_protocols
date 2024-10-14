@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('protocols', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
+            $table->string('name');
+            $table->longText('description');
             $table->double('priority');
             $table->timestamps();
         });
