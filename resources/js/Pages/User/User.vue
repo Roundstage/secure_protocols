@@ -40,15 +40,14 @@ const confirmDelete = async (id) => {
     if (confirm('Are you sure you want to delete this User?')) {
         try {
             const response = await UserService.deleteUser(id);
-
-            if (response.ok) {
-                Users.value.data = Users.value.data.filter(data => data.id !== id);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'User deleted successfully', life: 3000 });
+            if (response.status === 200) {
+                Users.value.data = Users.value.data.filter(user => user.id !== id);
+                toast.add({severity: 'success', summary: 'Success', detail: 'User deleted successfully', life: 3000});
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete user', life: 3000 });
+                toast.add({severity: 'error', summary: 'Error', detail: 'Failed to delete user', life: 3000});
             }
         } catch (error) {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete user', life: 3000 });
+            toast.add({severity: 'error', summary: 'Error', detail: 'Failed to delete user', life: 3000});
         }
     }
 };

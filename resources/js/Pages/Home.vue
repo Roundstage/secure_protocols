@@ -1,12 +1,31 @@
 <script setup>
 import Navbar from "./Components/Navbar.vue"
 import Accordion from "@/Pages/Components/Accordion.vue";
-import {onBeforeMount} from "vue";
+import {ref, onBeforeMount} from 'vue';
 import UserService from "@/Pages/Services/UserService.ts";
 
-UserService.fetchUser();
-const User = JSON.parse(localStorage.getItem('user')) || null;
+const User = ref({
+    id: 1,
+    name: 'Fake User',
+    email: 'fakeuser@example.com',
+    role: {
+        name: 'Fake Role',
+        description: 'This is a fake role description',
+        protocols: [
+            {name: 'Fake Protocol 1', description: 'Description for Fake Protocol 1'},
+            {name: 'Fake Protocol 2', description: 'Description for Fake Protocol 2'}
+        ]
+    }
+});
 
+const fetchUser = async () => {
+
+    await UserService.fetchUser();
+
+    User.value = JSON.parse(localStorage.getItem('user'));
+};
+
+onBeforeMount(fetchUser);
 </script>
 
 <template>
