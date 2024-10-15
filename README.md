@@ -9,8 +9,7 @@ poderá operar no sistema. Também teremos a "Staff", que são os funcionários 
 acesso apenas à homepage onde estão seus protocolos de segurança e uma descrição dos seus trabalhos.
 
 Escolhi utilizar Laravel, VueJS e Inertia para facilitar o desenvolvimento da single page application. Usei middlewares
-e requests para uma dupla camada de segurança, e não utilizei serviços no back-end, devido à simplicidade das funções,
-cada controller foi separado em uma classe única. Utilizei Bootstrap pois soube na entrevista que a eSocial também
+e requests para uma dupla camada de segurança cada controller foi separado em uma classe única e possui seu service. Utilizei Bootstrap pois soube na entrevista que a eSocial também
 costuma utilizar, e como um desafio para mim mesmo, me forcei a aprender PrimeVue, semelhante ao Bootstrap, mas feito
 para o Vue.
 
